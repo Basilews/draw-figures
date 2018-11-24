@@ -98,7 +98,6 @@ class DrawFigures {
 
   drawCircle(area) {
     const r = Math.round(Math.sqrt(area / Math.PI));
-    console.log(this.x0, this.y0, area, r);
 
     this.ctx.beginPath();
     this.ctx.arc(this.x0, this.y0, r, 0, 2 * Math.PI);
