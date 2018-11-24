@@ -31,6 +31,7 @@ class DrawFigures {
 
       if (this.it === 2) {
         this.drawCircle(this.drawParallelogram());
+        this.drawCenterPoint(this.x0, this.y0);
       }
 
       this.it++;
@@ -42,8 +43,13 @@ class DrawFigures {
     this.ctx.arc(x, y, 5.5, 0, 2 * Math.PI);
     this.ctx.fillStyle = 'red';
     this.ctx.fill();
-    this.ctx.strokeStyle = 'red';
-    this.ctx.stroke();
+  }
+
+  drawCenterPoint(x, y) {
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, 3, 0, 2 * Math.PI);
+    this.ctx.fillStyle = 'black';
+    this.ctx.fill();
   }
 
   resetCanvas() {
