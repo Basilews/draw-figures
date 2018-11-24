@@ -8,15 +8,19 @@ class DrawFigures {
     this.btn = document.querySelector('.reset');
     this.info = document.querySelector('.info');
     this.ctx = this.canvas.getContext('2d');
+    this.disclaimer = document.querySelector('.disclaimer');
 
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
 
-    this.canvas.addEventListener('click', event => {
-      this.generatePoints(event.clientX, event.clientY);
-    });
-
+    this.disclaimer.addEventListener('click', event => this.initDrawing(event));
+    this.canvas.addEventListener('click', event => this.initDrawing(event));
     this.btn.addEventListener('click', () => this.resetCanvas());
+  }
+
+  initDrawing(event) {
+    this.disclaimer.remove();
+    this.generatePoints(event.clientX, event.clientY);
   }
 
   generatePoints(x, y) {

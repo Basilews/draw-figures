@@ -8,15 +8,19 @@ class DrawFigures {
     this.btn = document.querySelector('.reset');
     this.info = document.querySelector('.info');
     this.ctx = this.canvas.getContext('2d');
+    this.disclaimer = document.querySelector('.disclaimer');
 
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
 
-    this.canvas.addEventListener('click', event => {
-      this.generatePoints(event.clientX, event.clientY);
-    });
-
+    this.disclaimer.addEventListener('click', event => this.initDrawing(event));
+    this.canvas.addEventListener('click', event => this.initDrawing(event));
     this.btn.addEventListener('click', () => this.resetCanvas());
+  }
+
+  initDrawing(event) {
+    this.disclaimer.remove();
+    this.generatePoints(event.clientX, event.clientY);
   }
 
   generatePoints(x, y) {
@@ -98,7 +102,6 @@ class DrawFigures {
 
   drawCircle(area) {
     const r = Math.round(Math.sqrt(area / Math.PI));
-    console.log(this.x0, this.y0, area, r);
 
     this.ctx.beginPath();
     this.ctx.arc(this.x0, this.y0, r, 0, 2 * Math.PI);
