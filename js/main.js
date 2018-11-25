@@ -8,6 +8,13 @@ class DrawFigures {
     this.it = 0;
     this.x0 = null;
     this.y0 = null;
+
+    this.point1 = null;
+    this.point2 = null;
+    this.point3 = null;
+    this.prlg = null;
+    this.circle = null;
+
     this.canvas = document.querySelector('canvas');
     this.btn = document.querySelector('.reset');
     this.info = document.querySelector('.info');
@@ -26,19 +33,6 @@ class DrawFigures {
 
   setupPaper() {
     paper.setup('canvas');
-
-    // const tool = new Tool();
-    // let path;
-
-    // tool.onMouseDown = function (event) {
-    //   path = new Path();
-    //   path.strokeColor = 'black';
-    //   path.add(event.point);
-    // }
-
-    // tool.onMouseDrag = function (event) {
-    //   path.add(event.point);
-    // }
   }
 
   initDrawing(event) {
@@ -54,7 +48,7 @@ class DrawFigures {
 
       if (this.it === 2) {
         this.drawCircle(this.drawParallelogram());
-        this.drawCenterPoint(this.x0, this.y0);
+        // this.drawCenterPoint(this.x0, this.y0);
       }
 
       this.it++;
@@ -62,15 +56,21 @@ class DrawFigures {
   }
 
   drawPoint(x, y) {
-    new Path.Circle({
-      center: [x, y],
-      radius: 5.5,
-      fillColor: 'red',
+    const point = `point${this.it + 1}`;
+
+    this[point] = new Path.Circle(new Point(x, y), 11);
+    this[point].fillColor = 'red';
+
+    this[point].on('mousedrag', event => {
+      if (this.prlg) {
+        this[point].position = event.point;
+        this.prlg.curves[event.target.index].point1 = event.point;
+        this.points[event.target.index] = { x: event.point.x, y: event.point.y };
+        this.prlg.curves[3].point1 = new Point(this.calculateFourthVertex());
+        // console.log(this.points[3]);
+        // console.log(new Point(this.calculateFourthVertex()));
+      }
     });
-    // this.ctx.beginPath();
-    // this.ctx.arc(x, y, 5.5, 0, 2 * Math.PI);
-    // this.ctx.fillStyle = 'red';
-    // this.ctx.fill();
   }
 
   drawCenterPoint(x, y) {
@@ -79,15 +79,10 @@ class DrawFigures {
       radius: 3,
       fillColor: 'black',
     });
-    // this.ctx.beginPath();
-    // this.ctx.arc(x, y, 3, 0, 2 * Math.PI);
-    // this.ctx.fillStyle = 'black';
-    // this.ctx.fill();
   }
 
   resetCanvas() {
     project.clear();
-    // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.it = 0;
     this.points = [];
     this.info.innerHTML = '';
@@ -98,48 +93,27 @@ class DrawFigures {
     const { points } = this;
     points.push(this.calculateFourthVertex());
 
-    const path = new Path();
-    path.strokeColor = 'blue';
+    this.prlg = new Path();
+    this.prlg.strokeColor = 'blue';
 
     for (let i = 0; i < 4; i++) {
-      path.add(new Point(points[i].x, points[i].y));
+      this.prlg.add(new Point(points[i].x, points[i].y));
     }
 
-    path.add(new Point(points[0].x, points[0].y));
+    this.prlg.closed = true;
 
-    // this.ctx.beginPath();
-    // this.ctx.moveTo(points[0].x, points[0].y);
-
-    // for (let i = 1; i < 4; i++) {
-    //   this.ctx.lineTo(points[i].x, points[i].y);
-    // }
-
-    // this.ctx.lineTo(points[0].x, points[0].y);
-    // this.ctx.strokeStyle = 'blue';
-    // this.ctx.stroke();
-
-    const a = Math.round(
-      Math.sqrt(
-        Math.pow(points[1].x - points[0].x, 2) + Math.pow(points[1].y - points[0].y, 2)
-      )
-    );
-
-    const b = Math.round(
-      Math.sqrt(
-        Math.pow(points[2].x - points[1].x, 2) + Math.pow(points[2].y - points[1].y, 2)
-      )
-    );
-
-    const area = a * b;
-
-    this.info.innerHTML += `<p>area of parallelogram: ${Math.round(area)}</p>`;
-    this.info.innerHTML += `<p>area of square: ${Math.round(area)}</p>`;
+    const area = this.prlg.area;
+    this.info.innerHTML += `
+      <p class="area">
+        area: ${area}</p>
+    `;
 
     return area;
   }
 
   calculateFourthVertex() {
     const { points } = this;
+    console.log(points);
 
     this.x0 = Math.round((points[0].x + points[2].x) / 2);
     this.y0 = Math.round((points[0].y + points[2].y) / 2);
@@ -150,23 +124,16 @@ class DrawFigures {
   }
 
   drawCircle(area) {
-    const r = Math.round(Math.sqrt(area / Math.PI));
+    const radius = Math.round(Math.sqrt(area / Math.PI));
 
-    // this.ctx.beginPath();
-    // this.ctx.arc(this.x0, this.y0, r, 0, 2 * Math.PI);
-    // this.ctx.strokeStyle = '#ead147';
-    // this.ctx.stroke();
-
-    new Path.Circle({
+    this.circle = Path.Circle({
       center: [this.x0, this.y0],
-      radius: r,
+      radius,
       strokeColor: '#ead147',
     });
   }
 };
 
-
 window.onload = function () {
   new DrawFigures;
-  // paper.setup('canvas');
 }
