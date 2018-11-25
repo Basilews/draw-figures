@@ -46,7 +46,11 @@ class DrawFigures {
     if (this.it < 3) {
       this.points.push({ x, y });
       this.drawPoint(x, y);
-      this.info.innerHTML += `<p>point${this.it + 1}: x: ${x}; y: ${y}</p>`;
+      this.info.innerHTML += `
+        <p class="point${this.it + 1}">
+          point${this.it + 1}: x: ${x}; y: ${y}
+        </p>
+      `;
 
       if (this.it === 2) {
         this.drawCircle(this.drawParallelogram());
@@ -65,11 +69,30 @@ class DrawFigures {
 
     this[point].on('mousedrag', event => {
       if (this.prlg) {
+        // Redraw rigures
         this.redrawParallelogram(point, event);
         this.redrawCircle();
         this.redrawCenterPoint();
+
+        // Update Figures Information
+        this.updatePointInfo(point, event);
+        this.updateAreaInfo();
       }
     });
+  }
+
+  updatePointInfo(point, event) {
+    const pointLabel = document.querySelector(`.${point}`);
+    pointLabel.innerHTML = `
+      point${this.it + 1}: x: ${event.point.x}; y: ${event.point.y}
+    `;
+  }
+
+  updateAreaInfo() {
+    const areaLabel = document.querySelector('.area');
+    areaLabel.innerHTML = `
+      area: ${Math.round(this.prlg.area)}
+    `;
   }
 
   drawCenterPoint(x, y) {
@@ -103,7 +126,8 @@ class DrawFigures {
     this.area = this.circleArea = area;
     this.info.innerHTML += `
       <p class="area">
-        area: ${Math.round(area)}</p>
+        area: ${Math.round(area)}
+      </p>
     `;
 
     return area;
