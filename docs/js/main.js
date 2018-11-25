@@ -1,4 +1,4 @@
-import '../node_modules/paper/dist/paper-core.js';
+import './paper-core.js';
 
 paper.install(window);
 
