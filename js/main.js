@@ -14,7 +14,6 @@ class DrawFigures {
     this.point3 = null;
     this.prlg = null;
     this.circle = null;
-    this.area = null;
     this.centerPoint = null;
 
     this.canvas = document.querySelector('canvas');
@@ -84,14 +83,16 @@ class DrawFigures {
   updatePointInfo(point, event) {
     const pointLabel = document.querySelector(`.${point}`);
     pointLabel.innerHTML = `
-      point${this.it + 1}: x: ${event.point.x}; y: ${event.point.y}
+      ${point}:
+      x: ${Math.round(event.point.x)};
+      y: ${Math.round(event.point.y)}
     `;
   }
 
   updateAreaInfo() {
     const areaLabel = document.querySelector('.area');
     areaLabel.innerHTML = `
-      area: ${Math.round(this.prlg.area)}
+      area: ${Math.round(Math.abs(this.prlg.area))}
     `;
   }
 
@@ -123,7 +124,6 @@ class DrawFigures {
     });
 
     const area = this.prlg.area;
-    this.area = this.circleArea = area;
     this.info.innerHTML += `
       <p class="area">
         area: ${Math.round(area)}

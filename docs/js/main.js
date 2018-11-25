@@ -1,9 +1,21 @@
+import '../node_modules/paper/dist/paper-core.js';
+
+paper.install(window);
+
 class DrawFigures {
   constructor() {
     this.points = [];
     this.it = 0;
     this.x0 = null;
     this.y0 = null;
+
+    this.point1 = null;
+    this.point2 = null;
+    this.point3 = null;
+    this.prlg = null;
+    this.circle = null;
+    this.centerPoint = null;
+
     this.canvas = document.querySelector('canvas');
     this.btn = document.querySelector('.reset');
     this.info = document.querySelector('.info');
@@ -13,9 +25,15 @@ class DrawFigures {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
 
-    this.disclaimer.addEventListener('click', event => this.initDrawing(event));
-    this.canvas.addEventListener('click', event => this.initDrawing(event));
-    this.btn.addEventListener('click', () => this.resetCanvas());
+    this.disclaimer.addEventListener('mousedown', event => this.initDrawing(event));
+    this.canvas.addEventListener('mousedown', event => this.initDrawing(event));
+    this.btn.addEventListener('mousedown', () => this.resetCanvas());
+
+    this.setupPaper();
+  }
+
+  setupPaper() {
+    paper.setup('canvas');
   }
 
   initDrawing(event) {
@@ -27,10 +45,15 @@ class DrawFigures {
     if (this.it < 3) {
       this.points.push({ x, y });
       this.drawPoint(x, y);
-      this.info.innerHTML += `<p>point${this.it + 1}: x: ${x}; y: ${y}</p>`;
+      this.info.innerHTML += `
+        <p class="point${this.it + 1}">
+          point${this.it + 1}: x: ${x}; y: ${y}
+        </p>
+      `;
 
       if (this.it === 2) {
         this.drawCircle(this.drawParallelogram());
+        this.drawCenterPoint(this.x0, this.y0);
       }
 
       this.it++;
@@ -38,16 +61,52 @@ class DrawFigures {
   }
 
   drawPoint(x, y) {
-    this.ctx.beginPath();
-    this.ctx.arc(x, y, 5.5, 0, 2 * Math.PI);
-    this.ctx.fillStyle = 'red';
-    this.ctx.fill();
-    this.ctx.strokeStyle = 'red';
-    this.ctx.stroke();
+    const point = `point${this.it + 1}`;
+
+    this[point] = new Path.Circle(new Point(x, y), 11);
+    this[point].fillColor = 'red';
+
+    this[point].on('mousedrag', event => {
+      if (this.prlg) {
+        // Redraw rigures
+        this.redrawParallelogram(point, event);
+        this.redrawCircle();
+        this.redrawCenterPoint();
+
+        // Update Figures Information
+        this.updatePointInfo(point, event);
+        this.updateAreaInfo();
+      }
+    });
+  }
+
+  updatePointInfo(point, event) {
+    const pointLabel = document.querySelector(`.${point}`);
+    pointLabel.innerHTML = `
+      ${point}:
+      x: ${Math.round(event.point.x)};
+      y: ${Math.round(event.point.y)}
+    `;
+  }
+
+  updateAreaInfo() {
+    const areaLabel = document.querySelector('.area');
+    areaLabel.innerHTML = `
+      area: ${Math.round(Math.abs(this.prlg.area))}
+    `;
+  }
+
+  drawCenterPoint(x, y) {
+    this.centerPoint = new Path.Circle(new Point(x, y), 3);
+    this.centerPoint.fillColor = 'black';
+  }
+
+  redrawCenterPoint() {
+    this.centerPoint.position = new Point(this.x0, this.y0);
   }
 
   resetCanvas() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    project.clear();
     this.it = 0;
     this.points = [];
     this.info.innerHTML = '';
@@ -58,35 +117,27 @@ class DrawFigures {
     const { points } = this;
     points.push(this.calculateFourthVertex());
 
-    this.ctx.beginPath();
-    this.ctx.moveTo(points[0].x, points[0].y);
+    this.prlg = new Path({
+      segments: this.points.map(point => [point.x, point.y]),
+      strokeColor: 'blue',
+      closed: true,
+    });
 
-    for (let i = 1; i < 4; i++) {
-      this.ctx.lineTo(points[i].x, points[i].y);
-    }
-
-    this.ctx.lineTo(points[0].x, points[0].y);
-    this.ctx.strokeStyle = 'blue';
-    this.ctx.stroke();
-
-    const a = Math.round(
-      Math.sqrt(
-        Math.pow(points[1].x - points[0].x, 2) + Math.pow(points[1].y - points[0].y, 2)
-      )
-    );
-
-    const b = Math.round(
-      Math.sqrt(
-        Math.pow(points[2].x - points[1].x, 2) + Math.pow(points[2].y - points[1].y, 2)
-      )
-    );
-
-    const area = a * b;
-
-    this.info.innerHTML += `<p>area of parallelogram: ${Math.round(area)}</p>`;
-    this.info.innerHTML += `<p>area of square: ${Math.round(area)}</p>`;
+    const area = this.prlg.area;
+    this.info.innerHTML += `
+      <p class="area">
+        area: ${Math.round(area)}
+      </p>
+    `;
 
     return area;
+  }
+
+  redrawParallelogram(point, event) {
+    this[point].position = event.point;
+    this.prlg.curves[event.target.index].point1 = event.point;
+    this.points[event.target.index] = { x: event.point.x, y: event.point.y };
+    this.prlg.curves[3].point1 = new Point(this.calculateFourthVertex());
   }
 
   calculateFourthVertex() {
@@ -103,11 +154,18 @@ class DrawFigures {
   drawCircle(area) {
     const r = Math.round(Math.sqrt(area / Math.PI));
 
-    this.ctx.beginPath();
-    this.ctx.arc(this.x0, this.y0, r, 0, 2 * Math.PI);
-    this.ctx.strokeStyle = '#ead147';
-    this.ctx.stroke();
+    this.circle = new Path.Circle(new Point(this.x0, this.y0), r);
+    this.circle.strokeColor = '#ead147';
+  }
+
+  redrawCircle() {
+    const r = Math.round(Math.sqrt(Math.abs(this.prlg.area) / Math.PI));
+    this.circle.remove();
+    this.circle = new Path.Circle(new Point(this.x0, this.y0), r);
+    this.circle.strokeColor = '#ead147';
   }
 };
 
-new DrawFigures;
+window.onload = function () {
+  new DrawFigures;
+}
