@@ -1,3 +1,7 @@
+import '../node_modules/paper/dist/paper-core.js';
+
+paper.install(window);
+
 class DrawFigures {
   constructor() {
     this.points = [];
@@ -13,9 +17,28 @@ class DrawFigures {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
 
-    this.disclaimer.addEventListener('click', event => this.initDrawing(event));
-    this.canvas.addEventListener('click', event => this.initDrawing(event));
-    this.btn.addEventListener('click', () => this.resetCanvas());
+    this.disclaimer.addEventListener('mousedown', event => this.initDrawing(event));
+    this.canvas.addEventListener('mousedown', event => this.initDrawing(event));
+    this.btn.addEventListener('mousedown', () => this.resetCanvas());
+
+    this.setupPaper();
+  }
+
+  setupPaper() {
+    paper.setup('canvas');
+
+    // const tool = new Tool();
+    // let path;
+
+    // tool.onMouseDown = function (event) {
+    //   path = new Path();
+    //   path.strokeColor = 'black';
+    //   path.add(event.point);
+    // }
+
+    // tool.onMouseDrag = function (event) {
+    //   path.add(event.point);
+    // }
   }
 
   initDrawing(event) {
@@ -39,21 +62,32 @@ class DrawFigures {
   }
 
   drawPoint(x, y) {
-    this.ctx.beginPath();
-    this.ctx.arc(x, y, 5.5, 0, 2 * Math.PI);
-    this.ctx.fillStyle = 'red';
-    this.ctx.fill();
+    new Path.Circle({
+      center: [x, y],
+      radius: 5.5,
+      fillColor: 'red',
+    });
+    // this.ctx.beginPath();
+    // this.ctx.arc(x, y, 5.5, 0, 2 * Math.PI);
+    // this.ctx.fillStyle = 'red';
+    // this.ctx.fill();
   }
 
   drawCenterPoint(x, y) {
-    this.ctx.beginPath();
-    this.ctx.arc(x, y, 3, 0, 2 * Math.PI);
-    this.ctx.fillStyle = 'black';
-    this.ctx.fill();
+    new Path.Circle({
+      center: [x, y],
+      radius: 3,
+      fillColor: 'black',
+    });
+    // this.ctx.beginPath();
+    // this.ctx.arc(x, y, 3, 0, 2 * Math.PI);
+    // this.ctx.fillStyle = 'black';
+    // this.ctx.fill();
   }
 
   resetCanvas() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    project.clear();
+    // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.it = 0;
     this.points = [];
     this.info.innerHTML = '';
@@ -64,16 +98,25 @@ class DrawFigures {
     const { points } = this;
     points.push(this.calculateFourthVertex());
 
-    this.ctx.beginPath();
-    this.ctx.moveTo(points[0].x, points[0].y);
+    const path = new Path();
+    path.strokeColor = 'blue';
 
-    for (let i = 1; i < 4; i++) {
-      this.ctx.lineTo(points[i].x, points[i].y);
+    for (let i = 0; i < 4; i++) {
+      path.add(new Point(points[i].x, points[i].y));
     }
 
-    this.ctx.lineTo(points[0].x, points[0].y);
-    this.ctx.strokeStyle = 'blue';
-    this.ctx.stroke();
+    path.add(new Point(points[0].x, points[0].y));
+
+    // this.ctx.beginPath();
+    // this.ctx.moveTo(points[0].x, points[0].y);
+
+    // for (let i = 1; i < 4; i++) {
+    //   this.ctx.lineTo(points[i].x, points[i].y);
+    // }
+
+    // this.ctx.lineTo(points[0].x, points[0].y);
+    // this.ctx.strokeStyle = 'blue';
+    // this.ctx.stroke();
 
     const a = Math.round(
       Math.sqrt(
@@ -109,11 +152,21 @@ class DrawFigures {
   drawCircle(area) {
     const r = Math.round(Math.sqrt(area / Math.PI));
 
-    this.ctx.beginPath();
-    this.ctx.arc(this.x0, this.y0, r, 0, 2 * Math.PI);
-    this.ctx.strokeStyle = '#ead147';
-    this.ctx.stroke();
+    // this.ctx.beginPath();
+    // this.ctx.arc(this.x0, this.y0, r, 0, 2 * Math.PI);
+    // this.ctx.strokeStyle = '#ead147';
+    // this.ctx.stroke();
+
+    new Path.Circle({
+      center: [this.x0, this.y0],
+      radius: r,
+      strokeColor: '#ead147',
+    });
   }
 };
 
-new DrawFigures;
+
+window.onload = function () {
+  new DrawFigures;
+  // paper.setup('canvas');
+}
