@@ -1,5 +1,3 @@
-import '../node_modules/paper/dist/paper-core.js';
-
 paper.install(window);
 
 class DrawFigures {
