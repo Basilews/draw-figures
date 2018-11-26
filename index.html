@@ -6,15 +6,30 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Draw Figures</title>
   <link rel="stylesheet" href="css/style.css">
-  <script src="node_modules/paper/dist/paper-core.js"></script>
+  <script src="node_modules/paper/dist/paper-core.min.js"></script>
 </head>
 <body>
   <canvas id="canvas"></canvas>
   <div class="info"></div>
   <div class="disclaimer">
-    <h2>tryck tre gånger</h2>
+    <h2 class="title">tryck tre gånger</h2>
+    <div class="help">help</div>
   </div>
-  <button class="reset">Reset</button>
+  <button class="reset isHidden">Reset</button>
+  <div class="description isHidden">
+    <p>1) Tap or click anywhere three times. Program will calculate fourth vertex of parallelogram for you.</p>
+    <p>2) Center of its diagonals will be center for circle with same area</p>
+    <p>3) Drag the points</p>
+    <p>4) ???</p>
+    <img
+      width="256"
+      height="256"
+      src="img/vzhukh.png"
+      srcset="img/vzhukh@2x.png 2x"
+      alt="Magic Cat"
+      class="image">
+    <div class="close">Got it!</div>
+  </div>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -21,13 +21,19 @@ class DrawFigures {
     this.info = document.querySelector('.info');
     this.ctx = this.canvas.getContext('2d');
     this.disclaimer = document.querySelector('.disclaimer');
+    this.title = document.querySelector('.title');
+    this.description = document.querySelector('.description');
+    this.help = document.querySelector('.help');
+    this.close = document.querySelector('.close');
 
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
 
-    this.disclaimer.addEventListener('mousedown', event => this.initDrawing(event));
+    this.title.addEventListener('mousedown', event => this.initDrawing(event));
     this.canvas.addEventListener('mousedown', event => this.initDrawing(event));
     this.btn.addEventListener('mousedown', () => this.resetCanvas());
+    this.help.addEventListener('mousedown', () => this.showDescription());
+    this.close.addEventListener('mousedown', () => this.closeDescription());
 
     this.setupPaper();
   }
@@ -36,8 +42,20 @@ class DrawFigures {
     paper.setup('canvas');
   }
 
+  showDescription() {
+    this.disclaimer.classList.add('isHidden');
+    this.description.classList.remove('isHidden');
+  }
+
+  closeDescription() {
+    this.disclaimer.classList.remove('isHidden');
+    this.description.classList.add('isHidden');
+  }
+
   initDrawing(event) {
     this.disclaimer.remove();
+    this.description.remove();
+    this.btn.classList.remove('isHidden');
     this.generatePoints(event.clientX, event.clientY);
   }
 
@@ -126,7 +144,7 @@ class DrawFigures {
     const area = this.prlg.area;
     this.info.innerHTML += `
       <p class="area">
-        area: ${Math.round(area)}
+        area: ${Math.round(Math.abs(area))}
       </p>
     `;
 
