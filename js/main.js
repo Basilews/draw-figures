@@ -19,7 +19,6 @@ class DrawFigures {
     this.info = document.querySelector('.info');
     this.ctx = this.canvas.getContext('2d');
     this.disclaimer = document.querySelector('.disclaimer');
-    this.title = document.querySelector('.title');
     this.description = document.querySelector('.description');
     this.help = document.querySelector('.help');
     this.close = document.querySelector('.close');
@@ -27,7 +26,6 @@ class DrawFigures {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
 
-    this.title.addEventListener('mousedown', event => this.initDrawing(event));
     this.canvas.addEventListener('mousedown', event => this.initDrawing(event));
     this.btn.addEventListener('mousedown', () => this.resetCanvas());
     this.help.addEventListener('mousedown', () => this.showDescription());
@@ -106,9 +104,14 @@ class DrawFigures {
   }
 
   updateAreaInfo() {
-    const areaLabel = document.querySelector('.area');
-    areaLabel.innerHTML = `
-      area: ${Math.round(Math.abs(this.prlg.area))}
+    const prlgAreaLabel = document.querySelector('.parallelogram');
+    const circleAreaLabel = document.querySelector('.circle');
+
+    prlgAreaLabel.innerHTML = `
+      parallelogram area: ${Math.round(Math.abs(this.prlg.area))}
+    `;
+    circleAreaLabel.innerHTML = `
+      circle area: ${Math.round(Math.abs(this.prlg.area))}
     `;
   }
 
@@ -141,8 +144,8 @@ class DrawFigures {
 
     const area = this.prlg.area;
     this.info.innerHTML += `
-      <p class="area">
-        area: ${Math.round(Math.abs(area))}
+      <p class="parallelogram">
+        parallelogram area: ${Math.round(Math.abs(area))}
       </p>
     `;
 
@@ -172,6 +175,12 @@ class DrawFigures {
 
     this.circle = new Path.Circle(new Point(this.x0, this.y0), r);
     this.circle.strokeColor = '#ead147';
+
+    this.info.innerHTML += `
+      <p class="circle">
+        circle area: ${Math.round(Math.abs(area))}
+      </p>
+    `;
   }
 
   redrawCircle() {
